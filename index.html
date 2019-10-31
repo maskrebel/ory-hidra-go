@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{.title}}</title>
+</head>
+<body>
+<a class="anon-only" href="/login">LOGIN</a><hr />
+<a class="anon-only" href="/auto_login">AUTO LOGIN</a><hr />
+<a href="auto_show_user.html">AUTO SHOW USER</a><hr />
+<a id="logout-btn" style="display: none;" href="/logout">LOGOUT</a><hr />
+<div id="current-user-sts"></div><hr />
+<div id="current-user-cors"></div><hr />
+
+<script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type='text/javascript'>
+    var callbackCollector = {}
+
+    $.getJSON('/me', function(data){
+        if(data.is_login){
+            callbackCollector.clientLogin = true
+            $('#current-user-sts').html('<h1>CURRENT CLIENT LOGIN username: '+data.username+'</h1>')
+            $("#logout-btn").show()
+            $(".anon-only").hide()
+        } else {
+            callbackCollector.clientLogin = false
+        }
+    })
+
+    $.ajax({
+        type: 'GET',
+        url: 'https://connect.detik.com/token/me',
+        contentType: 'application/json',
+
+        xhrFields: {
+            withCredentials: true
+        },
+
+        success: function(data) {
+            if(data.is_login){
+                callbackCollector.connectLogin = true
+                $('#current-user-cors').html('<h1>CORS test username: '+data.username+'</h1>')
+            }else{
+                callbackCollector.connectLogin = false
+            }
+        },
+
+        error: function(data) {
+            callbackCollector.connectLogin = false
+        }
+    });
+
+    var checkComplete = setInterval(function(){
+        console.log('checkComplete')
+        if((typeof callbackCollector.clientLogin !== 'undefined')
+            && (typeof callbackCollector.connectLogin !== 'undefined') ){
+            if(!callbackCollector.clientLogin && callbackCollector.connectLogin){
+                window.location.href = "/auto_login"
+            } else {
+                clearInterval(checkComplete)
+            }
+        }
+    }, 750);
+</script>
+</body>
+</html>
