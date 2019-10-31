@@ -1,1 +1,1 @@
-# ory-hidra-go
+https://localhost:3000
