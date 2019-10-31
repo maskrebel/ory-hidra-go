@@ -1,7 +1,7 @@
 version: '3'
 services:
-  ory-test-go:
-    container_name: ory-test-go
+  ory-hydra-go:
+    container_name: ory-hydra-go
     build:
       context: .
       dockerfile: go.Dockerfile
